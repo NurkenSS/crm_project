@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Clients</h1>
+  <ul>
+    {% for client in clients %}
+      <li>
+        <strong>{{ client.name }}</strong><br>
+        <p>Email: {{ client.email }}</p>
+        <p>Status: {{ client.get_status_display }}</p>
+        <p>Phone: {{ client.phone }}</p>
+        <p>Address: {{ client.address }}</p>
+        <a href="{% url 'client_detail' client.pk %}">View details</a>
+      </li>
+    {% empty %}
+      <p>No clients available.</p>
+    {% endfor %}
+  </ul>
+{% endblock %}

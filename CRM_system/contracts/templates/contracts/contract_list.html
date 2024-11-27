@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Contracts</h1>
+  <ul>
+    {% for contract in contracts %}
+      <li>
+        <strong>{{ contract.name }}</strong><br>
+        <p>Client: {{ contract.client.name }}</p>
+        <p>Status: {{ contract.get_status_display() }}</p>
+        <p>Amount: ${{ contract.amount }}</p>
+        <p>Start Date: {{ contract.start_date|date:"F j, Y" }}</p>
+        <p>End Date: {{ contract.end_date|date:"F j, Y" }}</p>
+        <a href="{% url 'contract_detail' contract.pk %}">View details</a>
+      </li>
+    {% empty %}
+      <p>No contracts available.</p>
+    {% endfor %}
+  </ul>
+{% endblock %}

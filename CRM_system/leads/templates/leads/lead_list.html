@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Leads</h1>
+  <ul>
+    {% for lead in leads %}
+      <li>
+        <strong>{{ lead.first_name }} {{ lead.last_name }}</strong><br>
+        <p>Email: {{ lead.email }}</p>
+        <p>Status: {{ lead.get_status_display }}</p>
+        <p>Campaign: {{ lead.campaign.title if lead.campaign else 'No campaign' }}</p>
+        <a href="{% url 'lead_detail' lead.pk %}">View details</a>
+      </li>
+    {% empty %}
+      <p>No leads available.</p>
+    {% endfor %}
+  </ul>
+{% endblock %}

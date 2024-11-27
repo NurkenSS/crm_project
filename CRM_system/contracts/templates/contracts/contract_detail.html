@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Contract Details</h1>
+  <p><strong>Name:</strong> {{ contract.name }}</p>
+  <p><strong>Client:</strong> {{ contract.client.name }}</p>
+  <p><strong>Status:</strong> {{ contract.get_status_display() }}</p>
+  <p><strong>Amount:</strong> ${{ contract.amount }}</p>
+  <p><strong>Start Date:</strong> {{ contract.start_date|date:"F j, Y" }}</p>
+  <p><strong>End Date:</strong> {{ contract.end_date|date:"F j, Y" }}</p>
+  <p><strong>Created At:</strong> {{ contract.created_at|date:"F j, Y" }}</p>
+  <p><strong>Updated At:</strong> {{ contract.updated_at|date:"F j, Y" }}</p>
+{% endblock %}
