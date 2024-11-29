@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Список контрактов</title>
+</head>
+<body>
+    <h1>Все контракты</h1>
+    <ul>
+        {% for contract in contracts %}
+            <li>{{ contract.name }} - {{ contract.status }} - {{ contract.client.name }} - {{ contract.start_date }} - {{ contract.end_date }}</li>
+        {% empty %}
+            <li>Нет контрактов для отображения.</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

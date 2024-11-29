@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Campaigns</h1>
+  <ul>
+    {% for campaign in campaigns %}
+      <li>
+        <strong>{{ campaign.title }}</strong><br>
+        <p>{{ campaign.description }}</p>
+        <p>Start: {{ campaign.start_date|date:"d M Y" }} | End: {{ campaign.end_date|date:"d M Y" }}</p>
+        <p>Status: {% if campaign.is_active %}Active{% else %}Inactive{% endif %}</p>
+      </li>
+    {% empty %}
+      <li>No campaigns available.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

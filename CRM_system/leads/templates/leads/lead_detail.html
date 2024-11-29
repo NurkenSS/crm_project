@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Lead Details</h1>
+  <p><strong>Name:</strong> {{ lead.first_name }} {{ lead.last_name }}</p>
+  <p><strong>Email:</strong> {{ lead.email }}</p>
+  <p><strong>Phone:</strong> {{ lead.phone }}</p>
+  <p><strong>Status:</strong> {{ lead.get_status_display }}</p>
+  <p><strong>Campaign:</strong> {{ lead.campaign.title if lead.campaign else 'No campaign' }}</p>
+  <p><strong>Created At:</strong> {{ lead.created_at }}</p>
+  <p><strong>Updated At:</strong> {{ lead.updated_at }}</p>
+{% endblock %}
