@@ -1,10 +1,9 @@
 import os
-import time
 import logging
 import configparser
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+from yandex_disk_service import YandexDisk
 
+# Чтение конфигурации
 config = configparser.ConfigParser()
 config.read('config.ini')
 
@@ -12,7 +11,6 @@ try:
     local_folder = config.get('settings', 'local_folder')
     cloud_folder = config.get('settings', 'cloud_folder')
     access_token = config.get('settings', 'access_token')
-    sync_interval = int(config.get('settings', 'sync_interval'))
     log_file = config.get('settings', 'log_file')
 except configparser.NoSectionError as e:
     logging.error(f"Missing section in config file: {e}")
@@ -21,72 +19,46 @@ except configparser.NoOptionError as e:
     logging.error(f"Missing option in config file: {e}")
     raise
 
-logging.basicConfig(filename=log_file, level=logging.INFO)
+# Настройка логирования
+logging.basicConfig(
+    filename=log_file,
+    level=logging.INFO,
+    format='%(asctime)s - %(message)s'
+)
 
-class SyncHandler(FileSystemEventHandler):
-    def __init__(self, disk_service):
-        self.disk_service = disk_service
-    
-    def on_modified(self, event):
-        if event.is_directory:
-            return
-        logging.info(f"File modified: {event.src_path}")
-        try:
-            # Перезагружаем список файлов (без аргументов)
-            self.disk_service.reload()
-        except Exception as e:
-            logging.error(f"Failed to reload: {e}")
-    
-    def on_created(self, event):
-        if event.is_directory:
-            return
-        logging.info(f"File created: {event.src_path}")
-        print(f"Attempting to upload file: {event.src_path}")
-        try:
-            # Загружаем файл на облако (здесь не должно быть src_path)
-            self.disk_service.upload_file(event.src_path)
-        except Exception as e:
-            logging.error(f"Failed to upload file {event.src_path}: {e}")
-    
-    def on_deleted(self, event):
-        if event.is_directory:
-            return
-        logging.info(f"File deleted: {event.src_path}")
-        try:
-            self.disk_service.delete_file(event.src_path)
-        except Exception as e:
-            logging.error(f"Failed to delete file {event.src_path}: {e}")
+# Создаем логгер
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+def sync_file(file_path, cloud_path, disk_service):
+    try:
+        # Загрузка файла в облако
+        disk_service.upload_file(file_path, cloud_path)
+        logger.info(f"Файл {file_path} загружен в облако.")
+        
+        # Обновление файла в облаке
+        disk_service.upload_file(file_path, cloud_path)  # Повторная загрузка для обновления
+        logger.info(f"Файл {file_path} обновлён в облаке.")
+        
+        # Удаление файла из облака
+        disk_service.delete_file(cloud_path)
+        logger.info(f"Файл {file_path} удалён из облака.")
+    except Exception as e:
+        logger.error(f"Ошибка при синхронизации файла {file_path}: {e}")
 
 def main():
-    from yandex_disk_service import YandexDisk    
+    logger.info(f"Начало работы программы.")
     
     if not os.path.exists(local_folder):
-        logging.error(f"Local folder {local_folder} does not exist.")
+        logger.error(f"Папка {local_folder} не существует.")
         return
     
     disk_service = YandexDisk(access_token, cloud_folder)
 
-    logging.info("Initial synchronization started.")
-    try:
-        # Первая синхронизация
-        for filename in os.listdir(local_folder):
-            file_path = os.path.join(local_folder, filename)
-            disk_service.upload_file(file_path)
-    except Exception as e:
-        logging.error(f"Error during initial sync: {e}")
-    
-    event_handler = SyncHandler(disk_service)
-    observer = Observer()
-    observer.schedule(event_handler, path=local_folder, recursive=False)
-    observer.start()
-    
-    try:
-        while True:
-            time.sleep(sync_interval)
-    except KeyboardInterrupt:
-        observer.stop()
-    observer.join()
+    # Синхронизация файла file1.txt
+    file_path = os.path.join(local_folder, "file1.txt")
+    cloud_path = file_path.replace(local_folder, cloud_folder)  # Путь для облака
+    sync_file(file_path, cloud_path, disk_service)
 
 if __name__ == "__main__":
     main()
-    
