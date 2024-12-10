@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "habits-tracker-bot"
+version = "0.1.0"
+description = "Telegram Habits Tracker Bot"
+authors = ["Your Name"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.115.6"
+sqlalchemy = "^2.0.36"
+alembic = "^1.14.0"
+psycopg2-binary = "^2.9.10"
+pytelegrambotapi = "^4.25.0"
+pydantic = "^2.10.3"
+python-jose = "^3.3.0"
+bcrypt = "^4.2.1"
+uvicorn = "^0.32.1"
+psycopg2 = "^2.9.10"
+asyncpg = "^0.30.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
